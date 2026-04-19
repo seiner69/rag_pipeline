@@ -5,10 +5,8 @@
 ## 架构
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│magic_chunker│ -> │magic_embedder│ -> │magic_vectorstore│ -> │magic_retriever│ -> │magic_generator│
-│   分块       │    │   向量化     │    │   向量存储    │    │    检索      │    │    生成      │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+[ magic_chunker ]  →  [ magic_embedder ]  →  [ magic_vectorstore ]  →  [ magic_retriever ]  →  [ magic_generator ]
+        分块                 向量化                   向量存储                   检索                  生成
 ```
 
 ## 包含模块
