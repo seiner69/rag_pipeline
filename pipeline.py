@@ -8,11 +8,11 @@ RAG 流水线主模块
 from dataclasses import dataclass, field
 from typing import Optional
 
-from magic_chunker.core import ChunkingResult
-from magic_embedder.core import EmbeddingResult
-from magic_vectorstore.core import QueryResult
-from magic_retriever.core import RetrievalResult
-from magic_generator.core import GenerationPrompt, GenerationResult
+from axiom_chunker.core import ChunkingResult
+from axiom_embedder.core import EmbeddingResult
+from axiom_vectorstore.core import QueryResult
+from axiom_retriever.core import RetrievalResult
+from axiom_generator.core import GenerationPrompt, GenerationResult
 
 
 @dataclass
@@ -91,13 +91,13 @@ class RAGPipeline:
     def _get_embedder(self):
         if self._embedder is None:
             if self.config.embedder_type == "sentence_transformer":
-                from magic_embedder.strategies import SentenceTransformerEmbedder
+                from axiom_embedder.strategies import SentenceTransformerEmbedder
                 self._embedder = SentenceTransformerEmbedder(model_name=self.config.embedder_model)
             elif self.config.embedder_type == "openai":
-                from magic_embedder.strategies import OpenAITextEmbedder
+                from axiom_embedder.strategies import OpenAITextEmbedder
                 self._embedder = OpenAITextEmbedder(model_name=self.config.embedder_model)
             elif self.config.embedder_type == "clip":
-                from magic_embedder.strategies import CLIPImageEmbedder
+                from axiom_embedder.strategies import CLIPImageEmbedder
                 self._embedder = CLIPImageEmbedder(model_name=self.config.embedder_model)
             else:
                 raise ValueError(f"Unknown embedder type: {self.config.embedder_type}")
@@ -106,13 +106,13 @@ class RAGPipeline:
     def _get_vector_store(self):
         if self._vector_store is None:
             if self.config.vectorstore_type == "chroma":
-                from magic_vectorstore import ChromaVectorStore
+                from axiom_vectorstore import ChromaVectorStore
                 self._vector_store = ChromaVectorStore(
                     collection_name=self.config.collection_name,
                     persist_dir=self.config.persist_dir,
                 )
             elif self.config.vectorstore_type == "faiss":
-                from magic_vectorstore import FAISSVectorStore
+                from axiom_vectorstore import FAISSVectorStore
                 self._vector_store = FAISSVectorStore(
                     dimension=0,  # 自动从第一个 embedding 检测
                     index_type=self.config.faiss_index_type,
@@ -125,7 +125,7 @@ class RAGPipeline:
     def _get_document_store(self):
         """获取或创建父文档存储 (InMemoryStore)"""
         if self._document_store is None:
-            from magic_vectorstore.core.inmemory_store import InMemoryStore
+            from axiom_vectorstore.core.inmemory_store import InMemoryStore
             if self.config.document_store_path:
                 import os
                 if os.path.exists(self.config.document_store_path):
@@ -141,10 +141,10 @@ class RAGPipeline:
         embedder = self._get_embedder()
         vector_store = self._get_vector_store()
         if self.config.retriever_type == "similarity":
-            from magic_retriever.strategies import SimilarityRetriever
+            from axiom_retriever.strategies import SimilarityRetriever
             return SimilarityRetriever(embedder=embedder, vector_store=vector_store)
         elif self.config.retriever_type == "mmr":
-            from magic_retriever.strategies import MMRRetriever
+            from axiom_retriever.strategies import MMRRetriever
             return MMRRetriever(
                 embedder=embedder,
                 vector_store=vector_store,
@@ -158,7 +158,7 @@ class RAGPipeline:
     def _get_retriever(self):
         if self._retriever is None:
             if self.config.chunking_strategy == "parent_child":
-                from magic_retriever.strategies import ParentChildRetriever
+                from axiom_retriever.strategies import ParentChildRetriever
                 child_retriever = self._get_child_retriever()
                 doc_store = self._get_document_store()
                 self._retriever = ParentChildRetriever(
@@ -170,13 +170,13 @@ class RAGPipeline:
                 embedder = self._get_embedder()
                 vector_store = self._get_vector_store()
                 if self.config.retriever_type == "similarity":
-                    from magic_retriever.strategies import SimilarityRetriever
+                    from axiom_retriever.strategies import SimilarityRetriever
                     self._retriever = SimilarityRetriever(
                         embedder=embedder,
                         vector_store=vector_store,
                     )
                 elif self.config.retriever_type == "mmr":
-                    from magic_retriever.strategies import MMRRetriever
+                    from axiom_retriever.strategies import MMRRetriever
                     self._retriever = MMRRetriever(
                         embedder=embedder,
                         vector_store=vector_store,
@@ -191,10 +191,10 @@ class RAGPipeline:
     def _get_generator(self):
         if self._generator is None:
             if self.config.generator_type == "openai":
-                from magic_generator.strategies import OpenAIGenerator
+                from axiom_generator.strategies import OpenAIGenerator
                 self._generator = OpenAIGenerator(model=self.config.generator_model)
             elif self.config.generator_type == "anthropic":
-                from magic_generator.strategies import AnthropicGenerator
+                from axiom_generator.strategies import AnthropicGenerator
                 self._generator = AnthropicGenerator(model=self.config.generator_model)
             else:
                 raise ValueError(f"Unknown generator type: {self.config.generator_type}")
@@ -208,7 +208,7 @@ class RAGPipeline:
             files: 文件路径列表，支持 MinerU 的 content_list.json 和 .md 文件
             nodes: 或者直接传入预处理的 Node 列表
         """
-        from magic_chunker.loaders import MinerUContentListLoader, MinerUMarkdownLoader
+        from axiom_chunker.loaders import MinerUContentListLoader, MinerUMarkdownLoader
 
         all_nodes = []
 
@@ -229,11 +229,11 @@ class RAGPipeline:
             all_nodes.extend(nodes)
 
         if not all_nodes:
-            from magic_chunker.core import ChunkingResult
+            from axiom_chunker.core import ChunkingResult
             return ChunkingResult(chunks=[], metadata={"total_nodes": 0})
 
         if self.config.chunking_strategy == "parent_child":
-            from magic_chunker.strategies import ParentChildChunker
+            from axiom_chunker.strategies import ParentChildChunker
             chunker = ParentChildChunker(
                 parent_chunk_size=self.config.parent_chunk_size,
                 parent_overlap=self.config.parent_overlap,
@@ -246,7 +246,7 @@ class RAGPipeline:
             self._parent_chunks = result.metadata.get("parent_documents", [])
             return result
         else:
-            from magic_chunker.strategies import SemanticChunker
+            from axiom_chunker.strategies import SemanticChunker
             chunker = SemanticChunker()
             result = chunker.chunk(all_nodes)
             self._chunks = result
@@ -281,7 +281,7 @@ class RAGPipeline:
 
         vector_store = self._get_vector_store()
 
-        from magic_vectorstore.core import VectorEntry
+        from axiom_vectorstore.core import VectorEntry
         entries = [
             VectorEntry(
                 id=chunk.id if self._chunks else f"chunk_{i}",
