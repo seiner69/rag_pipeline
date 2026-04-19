@@ -98,6 +98,5 @@ class ParentChildRetriever(BaseRetriever):
 
         return RetrievalResult(
             chunks=parent_docs,
-            scores=[p.score for p in parent_docs],
             query=query,
         )

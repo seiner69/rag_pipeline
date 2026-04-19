@@ -212,6 +212,7 @@ class RAGPipeline:
 
         all_nodes = []
 
+        # 从文件加载
         if files:
             for file_path in files:
                 if file_path.endswith('content_list.json'):
@@ -223,9 +224,13 @@ class RAGPipeline:
                     loaded_nodes = loader.load()
                     all_nodes.extend(loaded_nodes)
 
+        # 从传入的 Node 列表加载
+        if nodes:
+            all_nodes.extend(nodes)
+
         if not all_nodes:
             from magic_chunker.core import ChunkingResult
-            return ChunkingResult(chunks=[], total_nodes=0)
+            return ChunkingResult(chunks=[], metadata={"total_nodes": 0})
 
         if self.config.chunking_strategy == "parent_child":
             from magic_chunker.strategies import ParentChildChunker

@@ -60,7 +60,7 @@ class FAISSVectorStore(BaseVectorStore):
             if self.index_type == "flat":
                 return faiss.IndexFlatIP(self.dimension)
             elif self.index_type == "hnsw":
-                index = faiss.HNSWFlat(self.dimension, 32)
+                index = faiss.IndexHNSWFlat(self.dimension, 32)
                 return index
             elif self.index_type == "ivf":
                 quantizer = faiss.IndexFlatIP(self.dimension)
@@ -70,7 +70,7 @@ class FAISSVectorStore(BaseVectorStore):
             if self.index_type == "flat":
                 return faiss.IndexFlatL2(self.dimension)
             elif self.index_type == "hnsw":
-                return faiss.HNSWFlat(self.dimension, 32)
+                return faiss.IndexHNSWFlat(self.dimension, 32)
             elif self.index_type == "ivf":
                 quantizer = faiss.IndexFlatL2(self.dimension)
                 return faiss.IndexIVFFlat(quantizer, self.dimension, self.nlist)

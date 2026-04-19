@@ -95,7 +95,7 @@ def main():
     if args.action == "chunk":
         result = pipeline.chunk(files=args.files)
         stats = pipeline.stats()
-        print(f"分块完成: {len(result.chunks)} 个块, {result.total_nodes} 个节点")
+        print(f"分块完成: {len(result.chunks)} 个块, {result.metadata.get('total_nodes', 0)} 个节点")
         if stats.get("total_parent_docs"):
             print(f"  父文档: {stats['total_parent_docs']} 个")
         for i, chunk in enumerate(result.chunks[:3]):
