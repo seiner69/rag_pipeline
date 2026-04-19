@@ -1,2 +1,2 @@
-# rag_pipeline
+# Axiom
 # 模块化 RAG 流水线：分块 → 向量化 → 存储 → 检索 → 生成

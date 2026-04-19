@@ -1,4 +1,4 @@
-# rag_pipeline
+# Axiom
 
 模块化 RAG（检索增强生成）流水线，整合分块、向量化、存储、检索、生成五大模块。
 
@@ -13,11 +13,11 @@
 
 | 模块 | 功能 | 策略 |
 |------|------|------|
-| [magic_chunker](https://github.com/seiner69/magic_chunker) | 文档分块 | SemanticChunker、ParentChildChunker |
-| [magic_embedder](https://github.com/seiner69/magic_embedder) | 文本/图像向量化 | OpenAI、SentenceTransformer、CLIP |
-| [magic_vectorstore](https://github.com/seiner69/magic_vectorstore) | 向量存储检索 | ChromaDB、FAISS、InMemoryStore |
-| [magic_retriever](https://github.com/seiner69/magic_retriever) | 相似度/MMR 检索 | SimilarityRetriever、MMRRetriever、ParentChildRetriever |
-| [magic_generator](https://github.com/seiner69/magic_generator) | LLM 生成 | OpenAI GPT、Anthropic Claude |
+| [axiom-chunker](https://github.com/seiner69/axiom-chunker) | 文档分块 | SemanticChunker、ParentChildChunker |
+| [axiom-embedder](https://github.com/seiner69/axiom-embedder) | 文本/图像向量化 | OpenAI、SentenceTransformer、CLIP |
+| [axiom-vectorstore](https://github.com/seiner69/axiom-vectorstore) | 向量存储检索 | ChromaDB、FAISS、InMemoryStore |
+| [axiom-retriever](https://github.com/seiner69/axiom-retriever) | 相似度/MMR 检索 | SimilarityRetriever、MMRRetriever、ParentChildRetriever |
+| [axiom-generator](https://github.com/seiner69/axiom-generator) | LLM 生成 | OpenAI GPT、Anthropic Claude |
 
 ## 切块策略
 
@@ -55,7 +55,7 @@ config = RAGPipelineConfig(
 
 ```bash
 # 父子文档模式索引
-python -m rag_pipeline.run \
+python -m axiom.run \
     --action chunk \
     --chunking parent_child \
     --parent-size 1000 \
@@ -63,7 +63,7 @@ python -m rag_pipeline.run \
     --files /path/to/content_list.json
 
 # 完整流水线
-python -m rag_pipeline.run \
+python -m axiom.run \
     --action run \
     --chunking parent_child \
     --vectorstore faiss \
@@ -76,7 +76,7 @@ python -m rag_pipeline.run \
 ### Python API
 
 ```python
-from rag_pipeline import RAGPipeline, RAGPipelineConfig
+from axiom import RAGPipeline, RAGPipelineConfig
 
 # 普通模式
 config = RAGPipelineConfig(
@@ -105,12 +105,12 @@ print(result)
 
 ```bash
 # 检索
-python -m rag_pipeline.run \
+python -m axiom.run \
     --action retrieve \
     --query "公司营收是多少？"
 
 # 父子文档模式
-python -m rag_pipeline.run \
+python -m axiom.run \
     --action run \
     --chunking parent_child \
     --parent-size 1000 \
@@ -170,13 +170,14 @@ pip install sentence-transformers chromadb faiss-cpu openai anthropic transforme
 ## 模块结构
 
 ```
-rag_pipeline/
+axiom/
     __init__.py
     run.py               # CLI 入口
     pipeline.py          # 流水线主类
-    magic_chunker/       # 分块模块
-    magic_embedder/      # 向量化模块
-    magic_vectorstore/   # 向量存储模块
-    magic_retriever/     # 检索模块
-    magic_generator/     # 生成模块
+```
+
+依赖的子模块（独立安装）：
+
+```
+pip install axiom-chunker axiom-embedder axiom-vectorstore axiom-retriever axiom-generator
 ```
